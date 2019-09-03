@@ -1,0 +1,73 @@
+
+#set -x
+if [[ $1 = "" ]] || [[ $2 = "" ]]; then
+	echo "Using: "
+	echo "set_uart_mode port mode"
+	echo "where mode: 0-off, 1-RS232, 2-RS485, 3-RS422"
+	exit 0
+fi
+
+PORT="$1"
+MODE="$2"
+
+case $PORT in
+	"/dev/ttyAPP1")
+		echo "Port1"
+		PORT_232_OFF=76
+		PORT_485_NRE=78
+		PORT_422_NDE=79
+		;;
+	"/dev/ttyAPP2")
+		echo "Port2"
+		PORT_232_OFF=66
+		PORT_485_NRE=68
+		PORT_422_NDE=69
+		;;
+	*)
+		echo "Wrong port name"
+		exit 0;;
+esac
+
+echo $PORT_232_OFF > /sys/class/gpio/export
+echo $PORT_485_NRE > /sys/class/gpio/export
+echo $PORT_422_NDE > /sys/class/gpio/export
+
+echo out > /sys/class/gpio/gpio$PORT_232_OFF/direction
+echo out > /sys/class/gpio/gpio$PORT_485_NRE/direction
+echo out > /sys/class/gpio/gpio$PORT_422_NDE/direction
+
+case $MODE in
+	0)
+		echo "Set mode: Off"
+		VAL1=1
+		VAL2=1
+		VAL3=1
+	;;
+	1)
+		echo "Set mode: RS232"
+		VAL1=0
+		VAL2=1
+		VAL3=1
+	;;
+	2)
+		echo "Set mode: RS485"
+		VAL1=1
+		VAL2=0
+		VAL3=1
+	;;
+	3)
+		echo "Set mode: RS422"
+		VAL1=1
+		VAL2=0
+		VAL3=0
+	;;
+	*)
+		echo "Wrong mode"
+		exit 0;
+	;;
+esac
+
+echo $VAL1 > /sys/class/gpio/gpio$PORT_232_OFF/value
+echo $VAL2 > /sys/class/gpio/gpio$PORT_485_NRE/value
+echo $VAL3 > /sys/class/gpio/gpio$PORT_422_NDE/value
+
