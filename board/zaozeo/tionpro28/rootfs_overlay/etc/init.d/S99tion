@@ -1,0 +1,8 @@
+case "$1" in
+  start)
+    stty -F /dev/ttySP1 115200 -ixon ignbrk -icrnl -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke
+    stty -F /dev/ttySP2 115200 -ixon ignbrk -icrnl -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke    
+    ;;
+esac
+
+exit 0

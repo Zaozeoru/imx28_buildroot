@@ -11,26 +11,28 @@ PORT="$1"
 MODE="$2"
 
 case $PORT in
-	"/dev/ttyAPP1")
+	"/dev/ttySP1")
 		echo "Port1"
 		PORT_232_OFF=76
 		PORT_485_NRE=78
 		PORT_422_NDE=79
 		;;
-	"/dev/ttyAPP2")
+	"/dev/ttySP2")
 		echo "Port2"
-		PORT_232_OFF=66
-		PORT_485_NRE=68
-		PORT_422_NDE=69
+		PORT_232_OFF=68
+		PORT_485_NRE=70
+		PORT_422_NDE=71
 		;;
 	*)
 		echo "Wrong port name"
 		exit 0;;
 esac
 
-echo $PORT_232_OFF > /sys/class/gpio/export
-echo $PORT_485_NRE > /sys/class/gpio/export
-echo $PORT_422_NDE > /sys/class/gpio/export
+if [ ! -f "/sys/class/gpio/gpio$PORT_232_OFF/direction" ]; then
+	echo $PORT_232_OFF > /sys/class/gpio/export
+	echo $PORT_485_NRE > /sys/class/gpio/export
+	echo $PORT_422_NDE > /sys/class/gpio/export
+fi
 
 echo out > /sys/class/gpio/gpio$PORT_232_OFF/direction
 echo out > /sys/class/gpio/gpio$PORT_485_NRE/direction
@@ -42,24 +44,28 @@ case $MODE in
 		VAL1=1
 		VAL2=1
 		VAL3=1
+		set_uart_rs485 $PORT 0
 	;;
 	1)
 		echo "Set mode: RS232"
 		VAL1=0
 		VAL2=1
 		VAL3=1
+		set_uart_rs485 $PORT 0
 	;;
 	2)
 		echo "Set mode: RS485"
 		VAL1=1
 		VAL2=0
 		VAL3=1
+		set_uart_rs485 $PORT 1
 	;;
 	3)
 		echo "Set mode: RS422"
 		VAL1=1
 		VAL2=0
 		VAL3=0
+		set_uart_rs485 $PORT 0
 	;;
 	*)
 		echo "Wrong mode"
